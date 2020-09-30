@@ -1,0 +1,18 @@
+ 
+ <mat-toolbar color="primary">
+    <button mat-icon-button class="example-icon" aria-label="Example icon-button with menu icon">
+      <mat-icon>menu</mat-icon>
+    </button>    
+	<button mat-icon-button class="example-icon" aria-label="Example icon-button with menu icon">
+     <a style = "text-decoration:none;color:white"  routerLink = '/restricted/links-page' > Navigation </a>
+    </button>
+    
+    <span  class="example-spacer"></span>
+	
+	<button  (click) = "logOut()" >
+      Log Out
+    </button>
+	
+</mat-toolbar>
+
+<router-outlet (activate)="onActivate($event)" ></router-outlet>

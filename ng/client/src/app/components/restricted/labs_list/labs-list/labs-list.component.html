@@ -1,0 +1,10 @@
+<div class = "container-fluid d-flex justify-content-center align-content-center">
+	<div class = "container w-75 p-4 shadow-sm">
+		<mat-list role="list">
+		  <mat-list-item *ngFor = "let lab of labs" role="listitem"><a (click) = "goToLab(lab)">{{lab.lab_name}}</a></mat-list-item>
+
+		</mat-list>
+
+	</div>
+
+</div>

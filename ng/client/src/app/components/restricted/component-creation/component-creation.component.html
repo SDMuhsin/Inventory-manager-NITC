@@ -1,0 +1,49 @@
+<div class = "container-fluid h-100 w-100 d-flex justify-content-center align-content-center pt-4">
+	<div class = "w-75 h-75 shadow">
+	<div class = "container d-flex flex-column justify-content-start align-items-center h-100 w-100 p-2">
+		<form>
+			<mat-form-field class="py-2 example-full-width">
+			<mat-label>Template Name</mat-label>
+			<select (change) = "updateCurrentTemplate()" matNativeControl [ngModelOptions]="{standalone: true}" [(ngModel)] = "currentTemplateIndex">
+				<option value="-1">None</option>
+				<option *ngFor = 'let temp of templates;index as i' value={{i}}>{{temp.template_name}}</option>
+			</select>
+		</mat-form-field><br>
+		</form>
+
+		
+		<form (ngSubmit) = "submitComponent()">
+			<mat-form-field class="py-2 example-full-width">
+			<mat-label>Lab Name</mat-label>
+			<select  matNativeControl [ngModelOptions]="{standalone: true}" [(ngModel)] = 'currentPropertyDict["lab_id"]'>
+				<option value="-1">None</option>
+				<option *ngFor = 'let lab of labs;index as i' value={{lab._id}}>{{lab.lab_name}}</option>
+			</select>
+			</mat-form-field><br>
+			<mat-form-field class="py-2 example-full-width">
+			<mat-label>Total Quantity</mat-label>
+				<input matInput  [ngModelOptions]="{standalone: true}"  [(ngModel)] = 'currentPropertyDict["total_count"]' type = "number">
+			</mat-form-field><br>
+		
+		<mat-form-field class="py-2 example-full-width">
+			<mat-label>Component Name</mat-label>
+			<input matInput  [ngModelOptions]="{standalone: true}"  [(ngModel)] = 'currentPropertyDict["name"]' type = "text">
+		</mat-form-field>
+		<br>
+
+		<div *ngFor = "let cp of currentProperties; index as i">
+		<mat-form-field class="py-2 example-full-width">
+			<mat-label>{{cp.property_name}}</mat-label>
+			<input matInput  required minlength = "1" [ngModelOptions]="{standalone: true}"  [(ngModel)] = "currentPropertyDict[cp.property_name]" type = {{cp.property_value_type}}>
+		</mat-form-field>
+		<br>
+		</div>
+		<div class = "text-danger" style = "color:red" class = "w-100">{{currentErrorMessage}}</div>
+		<div class = "text-success" style = "color:green" class = "w-100">{{currentSuccessMessage}}</div>
+		<button mat-raised-button color="primary" type="submit"> Create Template </button>
+		</form>
+		
+	</div>
+	</div>
+</div>
+	

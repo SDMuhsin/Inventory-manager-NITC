@@ -1,0 +1,20 @@
+
+<form (ngSubmit) = "onSubmit()">
+<div class = "container flex-column align-items-center align-content-center d-flex justify-content-center w-100">
+  <mat-form-field appearance="fill">
+    <mat-label>Username(Registration number)</mat-label>
+    <input matInput name = "currentUsername" [(ngModel)] = "currentUsername">
+  </mat-form-field>
+  <br>  
+  <mat-form-field appearance="fill">
+    <mat-label>Password</mat-label>
+    <input type = "password" matInput name = "currentPassword" [(ngModel)] = "currentPassword">
+  </mat-form-field>
+  <br>  
+
+  
+  <p style = "color:red">{{currentErrorMessage}}</p>
+  <p style = "color:green">{{currentSuccessMessage}}</p>
+  <button mat-raised-button color="primary" type="submit"> Log In</button>
+  </div>
+</form>

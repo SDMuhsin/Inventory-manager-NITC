@@ -1,0 +1,44 @@
+<div class = "container-fluid h-100 w-100 d-flex justify-content-center align-content-center pt-4">
+	<div class = "w-75 h-75 shadow">
+	<div class = "container d-flex justify-content-center h-100 w-100 p-2">
+	<!-- FORM -->
+		
+
+		<form (ngSubmit) = "onSubmit()">
+		
+		<!-- Template Name -->
+		<mat-form-field class="py-2 example-full-width">
+			<mat-label>Component Template Name</mat-label>
+			<input matInput  name = "currentTemplateName" [(ngModel)]="currentTemplateName">
+		</mat-form-field>	
+		<br>
+		<mat-form-field class="py-2 example-full-width">
+			<mat-label>Number of Properties</mat-label>
+			<input matInput (change) = "updatePropertyCount()" name = "propertyCount" [(ngModel)]="currentPropertyCount" type = "number">
+		</mat-form-field>
+		<br>
+		<!-- Variable -->
+		<div *ngFor = "let cp of currentProperties; index as i">
+		<mat-form-field class="py-2 example-full-width">
+			<mat-label>Property Name</mat-label>
+			<input matInput  [ngModelOptions]="{standalone: true}" [(ngModel)] = "currentProperties[i].propertyName" type = "string">
+		</mat-form-field>
+		<mat-form-field class="py-2 example-full-width">
+			<mat-label>Property Value Type(string is highly recommended)</mat-label>
+			<select matNativeControl [ngModelOptions]="{standalone: true}" [(ngModel)] = "currentProperties[i].propertyValueType">
+				<option value="string">string</option>
+				<option value="string">number</option>
+			</select>
+		</mat-form-field>
+		<br>
+		
+		</div>
+		<p class = "text-danger">{{currentErrorMessage}}</p>
+		<p class = "text-success">{{currentSuccessMessage}}</p>
+		<button mat-raised-button color="primary" type="submit"> Create Template </button>
+		</form>
+		
+
+	</div>
+	</div>
+</div>

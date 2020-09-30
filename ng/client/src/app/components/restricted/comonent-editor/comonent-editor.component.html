@@ -1,0 +1,64 @@
+<div class = "container-fluid w-100 d-flex justify-content-center align-content-center pt-4">
+	<div class = "w-75 shadow">
+	<div class = "container d-flex flex-column justify-content-start align-items-center  w-100 p-2">
+		<div class = "w-100 d-flex  flex-column justify-content-start align-items-center p-4">
+		<form>
+			<mat-form-field class="py-2 example-full-width">
+			<mat-label>Lab Name</mat-label>
+			
+			<select  (change) = "changeLab()" matNativeControl [ngModelOptions]="{standalone: true}" [(ngModel)] = 'currentLabId'>
+				<option value="-1">None</option>
+				<option *ngFor = 'let lab of labs;index as i' value={{lab._id}}>{{lab.lab_name}}</option>
+			</select>
+			</mat-form-field><br>
+		</form>
+		</div>
+		<div class = "w-100 mt-4 p-4">
+			<table style = "width:100%" mat-table [dataSource]="currentComponentsBeingShown" class="">
+			  <!--- Note that these columns can be defined in any order.
+					The actual rendered columns are set as a property on the row definition" -->
+
+			  <!-- Position Column -->
+			  
+			  <ng-container matColumnDef="name">
+				<th mat-header-cell *matHeaderCellDef> Component Name </th>
+				<td mat-cell *matCellDef="let element"> {{element.name}}</td>
+			  </ng-container>			  
+			  <ng-container matColumnDef="total_count">
+				<th mat-header-cell *matHeaderCellDef> Total Count </th>
+				<td mat-cell *matCellDef="let element"> {{element.total_count}}</td>
+			  </ng-container>			  
+			  <ng-container matColumnDef="in_inventory_count">
+				<th mat-header-cell *matHeaderCellDef> In inventory count</th>
+				<td mat-cell *matCellDef="let element"> {{element.in_inventory_count}}</td>
+			  </ng-container>
+
+
+  
+			  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+			  <tr (click)="editMode(row)" mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+			</table>
+			
+		</div>
+		
+		<div class = "w-100 mt-4 p-4">
+			<h3 class = "w-100 text-center"> Edit Component</h3>
+			<form (ngSubmit) = "putComponent()">
+				<div *ngFor = "let key of currentKeys" class = "w-100 d-flex flex-column justify-content-center">
+				<mat-form-field  class="py-2 example-full-width">
+					<mat-label>{{key}}</mat-label>
+					<input matInput  [ngModelOptions]="{standalone: true}" [(ngModel)] = "currentRowBeingEditedPublicVersion[key]" type = "string">
+				</mat-form-field>
+				<br>
+				</div>
+				<div class = "w-100 d-flex justify-content-space-between">
+					<button mat-raised-button color="primary" type="submit"> Update Component </button>
+					<button mat-raised-button color="danger" (click) = "deleteComponent()"> Delete Component </button>
+				</div>
+			</form>
+		</div>
+		<div style="color:red">{{currentErrorMessage}}</div>
+		<div style="color:green">{{currentSuccessMessage}}</div>
+	</div>
+	</div>
+</div>

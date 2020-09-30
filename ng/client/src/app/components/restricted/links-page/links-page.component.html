@@ -1,0 +1,10 @@
+<div class = "container-fluid d-flex justify-content-center align-content-center">
+	<div class = "container w-75 p-4 shadow-sm">
+		<div class = "w-100 p-2">
+			<a routerLink = "/">Home</a>
+		</div>
+		<div *ngFor = "let link of links" class = "w-100 p-2" >
+			<a routerLink = {{link.url}} > {{link.name}} </a>
+		</div>
+	</div>
+</div>

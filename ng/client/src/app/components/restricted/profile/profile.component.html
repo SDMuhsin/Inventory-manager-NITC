@@ -1,0 +1,26 @@
+<div class = "container-fluid h-100 w-100 d-flex justify-content-center align-content-center pt-4">
+	<div class = "w-75 h-75 shadow">
+	<div class = "container d-flex justify-content-center h-100 w-100 p-2">
+		<form>
+		
+		  <mat-form-field class="py-2 example-full-width">
+    <mat-label>Registration Number</mat-label>
+    <input matInput disabled name = "user_registration_number" [(ngModel)]="user.user_registration_number">
+  </mat-form-field>	  
+  <mat-form-field class="py-2 example-full-width">
+    <mat-label>Access Level</mat-label>
+    <input matInput disabled name = "user_access_level" [(ngModel)]="user.user_access_level">
+  </mat-form-field>			
+
+  <mat-form-field class="py-2 example-full-width">
+    <mat-label>Email</mat-label>
+    <input matInput name = "user_email" disabled [(ngModel)]="user.user_email">
+  </mat-form-field>
+  <mat-form-field class="py-2 example-full-width">
+    <mat-label>Account Verification Status</mat-label>
+    <input matInput disabled name = "user_account_verified" [(ngModel)]="user.user_account_approved">
+  </mat-form-field>			
+		</form>
+	</div>
+	</div>
+</div>

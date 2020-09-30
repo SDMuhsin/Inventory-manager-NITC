@@ -1,0 +1,22 @@
+<div class = "container-fluid w-100 h-100">
+	<div class = "row  w-100 justify-content-center py-4">
+		<div *ngIf = "!loggedInStatus" class = "col-sm-8 shadow "  >
+			<mat-tab-group mat-stretch-tabs >
+			  <mat-tab label="Register"> 
+				<div class="container-fluid py-4 d-flex justify-content-center" >
+				<app-register></app-register>
+				</div>
+			  </mat-tab>
+			  <mat-tab label="Log In"> 
+				<div class="container-fluid py-4 d-flex justify-content-center" >
+				<app-login (tellHomeToRefreshNav) = "refreshNavBar()"></app-login>
+				</div>
+			  </mat-tab>
+			</mat-tab-group>
+		</div>
+		
+		<div *ngIf = "loggedInStatus" class = "col-sm-4 shadow d-flex justify-content-center align-content-center">
+			<p class = "p-4">Logged In</p>
+		</div>
+	</div>
+</div>
