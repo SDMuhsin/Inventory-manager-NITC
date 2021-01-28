@@ -35,6 +35,7 @@ import { TemplateGeneratorComponent } from './components/restricted/template-gen
 import { ComponentCreationComponent } from './components/restricted/component-creation/component-creation.component';
 import { ComponentEditorComponent } from './components/restricted/comonent-editor/comonent-editor.component';
 import { LinksPageComponent } from './components/restricted/links-page/links-page.component';
+import { TransactionsComponent } from './components/restricted/transactions/transactions.component';
 
 @NgModule({
   declarations: [
@@ -49,7 +50,8 @@ import { LinksPageComponent } from './components/restricted/links-page/links-pag
     TemplateGeneratorComponent,
     ComponentCreationComponent,
     ComponentEditorComponent,
-    LinksPageComponent
+    LinksPageComponent,
+    TransactionsComponent
   ],
   imports: [
     BrowserModule,

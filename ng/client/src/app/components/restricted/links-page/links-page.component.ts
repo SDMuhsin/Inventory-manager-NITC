@@ -26,6 +26,7 @@ export class LinksPageComponent implements OnInit {
 		{url:'/restricted/labs',name:'View Labs'},
 		{url:'/restricted/component/creation',name:'Create Component'},
 		{url:'/restricted/component/editor',name:'Edit Component'},
+		{url:'/restricted/transactions',name:'Transactions'}
 		];
 	}else if(this.role == this.roles[2]){
 		this.links = [
@@ -34,6 +35,7 @@ export class LinksPageComponent implements OnInit {
 		{url:'/restricted/component/creation',name:'Create Component'},
 		{url:'/restricted/component/editor',name:'Edit Component'},
 		{url:'/restricted/template/generator',name:'Create Template'},
+			{url:'/restricted/transactions',name:'Transactions'}
 		];		
 	}
   }

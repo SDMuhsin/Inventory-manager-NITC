@@ -66,7 +66,7 @@ export class ComponentCreationComponent implements OnInit {
 		  this.currentPropertyDict["in_inventory_count"] = this.currentPropertyDict["total_count"];
 		  
 		  this.currentPropertyDict["template_id"] = this.templates[this.currentTemplateIndex]["_id"];
-		  this.dataService.postComponent(this.currentPropertyDict).subscribe(data=>{console.log(data);this.currentSuccessMessage = "Success, Component Created";		},err=>{
+		  this.dataService.postComponent(this.currentPropertyDict).subscribe(data=>{console.log(data);this.currentSuccessMessage = "Success, Component Created";},err=>{
 			  console.log(err);
 			  if(err.status == 400){
 				  this.currentErrorMessage = "Component already exists for this lab";

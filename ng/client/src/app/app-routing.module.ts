@@ -10,7 +10,7 @@ import {TemplateGeneratorComponent} from './components/restricted/template-gener
 import {ComponentCreationComponent} from './components/restricted/component-creation/component-creation.component';
 import {ComponentEditorComponent} from './components/restricted/comonent-editor/comonent-editor.component';
 import {LinksPageComponent} from './components/restricted/links-page/links-page.component';
-
+import {TransactionsComponent} from './components/restricted/transactions/transactions.component';
 import {AuthGuardService} from './services/guard/auth-guard.service';
 const routes: Routes = [
 	{path:'', component : HomeComponent},
@@ -24,6 +24,8 @@ const routes: Routes = [
 	{path:'restricted/component/creation',component : ComponentCreationComponent,canActivate: [AuthGuardService],
         data: {roles: ['Staff','Admin'],accessRequired:true}},
 	{path:'restricted/component/editor',component : ComponentEditorComponent,canActivate: [AuthGuardService],
+        data: {roles: ['Staff','Admin'],accessRequired:true}},
+	{path:'restricted/transactions',component : TransactionsComponent,canActivate: [AuthGuardService],
         data: {roles: ['Staff','Admin'],accessRequired:true}},
 	
 	{path:'restricted/links-page',component : LinksPageComponent,canActivate: [AuthGuardService],

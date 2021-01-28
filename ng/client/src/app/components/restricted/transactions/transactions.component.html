@@ -1,0 +1,325 @@
+<div class = "container-fluid h-100 w-100 d-flex justify-content-center align-content-center p-1">
+	<div class = "container d-flex flex-column justify-content-start align-items-center h-100 shadow w-100 m-2 p-2">
+		<!-- Choose whether to create or edit transactions -->
+		<div class = "container d-flex flex-row justify-content-start p-2 align-items-start w-100"> 
+			<form>
+				<mat-form-field class="py-2 example-full-width">
+					<mat-label>Transaction Action</mat-label>
+					<select  matNativeControl [ngModelOptions]="{standalone: true}" [(ngModel)] = "currentPage">
+						<option value="-1">None</option>
+						<option *ngFor = 'let page of pages;index as i' value={{page}}>{{page}}</option>
+					</select>
+				</mat-form-field>
+				<mat-form-field class="py-2 example-full-width">
+					<mat-label>LAB</mat-label>
+					<select (change) = "changeCurrentLab()" matNativeControl [ngModelOptions]="{standalone: true}" [(ngModel)] = "currentLabId">
+						<option value="-1">None</option>
+						<option *ngFor = 'let lab of labs;index as i' value={{lab._id}}>{{lab.lab_name}}</option>
+					</select>
+				</mat-form-field><br>
+			</form>
+		</div>
+		<div class = 'container-fluid' [ngSwitch] = "currentPage">
+		
+		<!-- Create tab -->
+		<div *ngSwitchCase="'create'" class = "container d-flex flex-column justify-content-start p-2 align-items-center w-100"> 
+		
+			<div class = 'row shadow-sm' style="max-height:80vh;overflow:auto">
+				<!-- Select Components -->
+				<div class = 'col container d-flex flex-column justify-content-start'>
+					<h4> Components </h4>
+					<mat-form-field>
+					  <mat-label>Filter</mat-label>
+					  <input matInput (keyup)="applyComponentsFilter($event)" placeholder="Ex. ium" #input>
+					</mat-form-field>
+
+					<!-- Components list -->
+					<table mat-table [dataSource]="currentComponentsDisplayed" class="mat-elevation-z2">
+					  <!--- Note that these columns can be defined in any order.
+							The actual rendered columns are set as a property on the row definition" -->
+
+					  <!-- Position Column -->
+					  <ng-container matColumnDef="name">
+						<th mat-header-cell *matHeaderCellDef> Name </th>
+						<td mat-cell *matCellDef="let element"> {{element.name}} </td>
+					  </ng-container>
+
+					  <!-- Name Column -->
+					  <ng-container matColumnDef="in_inventory_count">
+						<th mat-header-cell *matHeaderCellDef> Available</th>
+						<td mat-cell *matCellDef="let element"> {{element.in_inventory_count}} </td>
+					  </ng-container>
+
+					  <tr mat-header-row *matHeaderRowDef="displayedColumnsComponents"></tr>
+					  <tr mat-row *matRowDef="let row; columns: displayedColumnsComponents;" (click) = "changeFocus(row)"></tr>
+					</table>
+				</div>
+				<!-- Cart -->
+				<div class = 'col container d-flex flex-column justify-content-start'>
+					<h4> Cart </h4>
+
+					<!-- Components list -->
+					<table mat-table [dataSource]="cartToDisplayMatSource" class="mat-elevation-z2">
+					  <!--- Note that these columns can be defined in any order.
+							The actual rendered columns are set as a property on the row definition" -->
+
+					  <!-- Position Column -->
+					  <ng-container matColumnDef="name">
+						<th mat-header-cell *matHeaderCellDef> Name </th>
+						<td mat-cell *matCellDef="let element"> {{element.name}} </td>
+					  </ng-container>
+
+					  <!-- Name Column -->
+					  <ng-container matColumnDef="quantity">
+						<th mat-header-cell *matHeaderCellDef> Quantity</th>
+						<td style = "width:200px" mat-cell *matCellDef="let element;index as r" ><div class = 'w-100 d-flex flex-row justify-content-center align-items-center p-1'><div (click) = 'changeCartQuantity(r,"+")'class = 'btn btn-success'> + </div> <div class = 'px-2'>{{element.quantity}}</div> <div (click) = 'changeCartQuantity(r,"-")'class = 'btn btn-danger'>-</div><div (click)="removeCartItem(r)" class = "btn btn-dark"> X </div></div></td>
+					  </ng-container>
+
+					  <tr mat-header-row *matHeaderRowDef="displayedColumnsCart"></tr>
+					  <tr mat-row *matRowDef="let row; columns: displayedColumnsCart;" (click) = "changeFocus(row)"></tr>
+					</table>
+				</div>
+				<div class = 'col container d-flex flex-column justify-content-start'>
+					<h4> Details </h4>
+
+					<!-- Components list -->
+					<div >
+						<div class = "d-flex justify-content-between flex-row shadow-sm" *ngFor = 'let k of currentFocusedComponentKeys'><div class = "text-bold">{{k}}</div><div>{{currentFocusedComponent[k]}}</div></div>
+					</div>
+				</div>
+				
+				<!-- Users -->
+				<div class = 'col container d-flex flex-column justify-content-start' >
+					<h4> Lend to : </h4>
+					<mat-form-field>
+					  <mat-label>Filter</mat-label>
+					  <input matInput (keyup)="applyUsersFilter($event)" placeholder="Ex. ium" #input>
+					</mat-form-field>
+
+					<!-- Components list -->
+					<table mat-table [dataSource]="activeUsers" class="mat-elevation-z2" >
+					  <!--- Note that these columns can be defined in any order.
+							The actual rendered columns are set as a property on the row definition" -->
+
+					  <!-- Position Column -->
+					  <ng-container matColumnDef="user_registration_number">
+						<th mat-header-cell *matHeaderCellDef> Name </th>
+						<td mat-cell *matCellDef="let element"> {{element.user_registration_number}} </td>
+					  </ng-container>
+
+					  <tr mat-header-row *matHeaderRowDef="displayedColumnsUsers"></tr>
+					  <tr mat-row *matRowDef="let row; columns: displayedColumnsUsers;" (click)="changeLendee(row)" ></tr>
+					</table>
+				</div>
+			</div>
+			<div class = "shadow-sm m-2 container">
+				<div class = "row d-flex flex-row justify-content-center">
+					<div class = "btn btn-success" (click) = "createTransaction()"> Create Transaction</div>
+				</div>
+			</div>
+			<div>
+				<p class = "lead"> {{transactionCreationStatusMessage}}</p>
+			</div>
+		</div>
+		
+		<!-- edit tab -->
+		<div *ngSwitchCase="'edit'" class = "container d-flex flex-column justify-content-start p-2 align-items-start w-100"> 
+			<!-- We Require a nested switch case here for transactions with different approval_status -->
+			<form>
+				<select (change) = "changeEditMode()"  matNativeControl [ngModelOptions]="{standalone: true}" [(ngModel)] = "currentEditMode">
+					<option value="-1">None</option>
+					<option *ngFor = 'let mode of editModes;index as i' value={{mode}}>{{mode}}</option>
+				</select>
+			</form>
+			<div class = 'container-fluid' [ngSwitch] = "currentEditMode">
+				<!-- PENDING TRANSACTION PAGE -->
+				<div *ngSwitchCase="'PENDING'" class = "container d-flex flex-column justify-content-start p-2 align-items-center w-100">
+					<div class = "container-fluid d-flex flex-row p-2 justify-content-center align-content-center">
+						<!-- Components list -->
+						<table mat-table [dataSource]="currentTransactionsDisplayed" class="mat-elevation-z2">
+						  <!--- Note that these columns can be defined in any order.
+								The actual rendered columns are set as a property on the row definition" -->
+
+						  <!-- Position Column -->
+						  <ng-container matColumnDef="openedDate">
+							<th mat-header-cell *matHeaderCellDef> Opened Date </th>
+							<td mat-cell *matCellDef="let element"> {{element.openedDate}} </td>
+						  </ng-container>
+
+						  <!-- Name Column -->
+						  <ng-container matColumnDef="customerName">
+							<th mat-header-cell *matHeaderCellDef> Customer</th>
+							<td mat-cell *matCellDef="let element"> {{element.customerName}} </td>
+						  </ng-container>
+
+						  <tr mat-header-row *matHeaderRowDef="displayedColumnsTransactions"></tr>
+						  <tr mat-row *matRowDef="let row; columns: displayedColumnsTransactions;" (click) = "changeEditFocus(row)" ></tr>
+						</table>
+					<!-- edit transaction : cart -->
+					<div class = 'col container d-flex flex-column justify-content-start'>
+					<h4> Cart </h4>
+
+						<!-- Components list -->
+						<table mat-table [dataSource]="currentEditCartToDisplay" class="mat-elevation-z2">
+						  <!--- Note that these columns can be defined in any order.
+								The actual rendered columns are set as a property on the row definition" -->
+
+						  <!-- Position Column -->
+						  <ng-container matColumnDef="name">
+							<th mat-header-cell *matHeaderCellDef> ID </th>
+							<td mat-cell *matCellDef="let element"> {{element.Name}} </td>
+						  </ng-container>
+
+						  <!-- Name Column -->
+						  <ng-container matColumnDef="quantity">
+							<th mat-header-cell *matHeaderCellDef> Quantity</th>
+							<td style = "width:200px" mat-cell *matCellDef="let element;index as r" ></td>
+						  </ng-container>
+
+						  <tr mat-header-row *matHeaderRowDef="displayedColumnsCart"></tr>
+						  <tr mat-row *matRowDef="let row; columns: displayedColumnsCart;" (click) = "changeFocus(row)"></tr>
+						</table>
+						
+						<div class = "d-flex flex-row justify-content-between">
+						<div class = "btn btn-success" (click) = "approveTransaction('APPROVED')"> Approve Transaction </div>
+						<div class = "btn btn-danger" (click) = "approveTransaction('DENIED')"> Deny Transaction </div>
+						</div>
+					</div>
+
+					</div>
+				</div><!-- PENDING END -->
+				
+				<!-- APPROVED BEGIN -->
+				<div *ngSwitchCase="'APPROVED'" class = "container d-flex flex-column justify-content-start p-2 align-items-center w-100">
+					<div class = "container-fluid d-flex flex-row p-2 justify-content-center align-content-center">
+						<!-- Components list -->
+						<table mat-table [dataSource]="currentTransactionsDisplayed" class="mat-elevation-z2">
+						  <!--- Note that these columns can be defined in any order.
+								The actual rendered columns are set as a property on the row definition" -->
+
+						  <!-- Position Column -->
+						  <ng-container matColumnDef="openedDate">
+							<th mat-header-cell *matHeaderCellDef> Opened Date </th>
+							<td mat-cell *matCellDef="let element"> {{element.openedDate}} </td>
+						  </ng-container>
+
+						  <!-- Name Column -->
+						  <ng-container matColumnDef="customerName">
+							<th mat-header-cell *matHeaderCellDef> Customer</th>
+							<td mat-cell *matCellDef="let element"> {{element.customerName}} </td>
+						  </ng-container>
+
+						  <tr mat-header-row *matHeaderRowDef="displayedColumnsTransactions"></tr>
+						  <tr mat-row *matRowDef="let row; columns: displayedColumnsTransactions;" (click) = "changeEditFocus(row)" ></tr>
+						</table>
+					<!-- edit transaction :APPROVED : return cart -->
+					<div class = 'col container d-flex flex-column justify-content-start'>
+						<h4> Cart </h4>
+
+						<!-- Components list -->
+						<table mat-table [dataSource]="currentEditCloseTransactionsFocusReturnCartMatSource" class="mat-elevation-z2">
+						  <!--- Note that these columns can be defined in any order.
+								The actual rendered columns are set as a property on the row definition" -->
+
+						  <!-- Position Column -->
+						  <ng-container matColumnDef="name">
+							<th mat-header-cell *matHeaderCellDef> ID </th>
+							<td mat-cell *matCellDef="let element"> {{element.Name}} </td>
+						  </ng-container>
+
+						  <!-- Taken quantity Column -->
+						  <ng-container matColumnDef="quantity">
+							<th mat-header-cell *matHeaderCellDef> Taken</th>
+							<td style = "width:200px" mat-cell *matCellDef="let element;index as r" > {{element.quantity}}</td>
+						  </ng-container>
+						  <!-- Name Column -->
+						  <ng-container matColumnDef="returned">
+							<th mat-header-cell *matHeaderCellDef> Returned</th>
+							<td style = "width:200px" mat-cell *matCellDef="let element;index as r" >
+							  <div class = 'w-100 d-flex flex-row justify-content-center align-items-center p-1'>
+								<div (click) = 'changeEditReturnCartQuantity(r,"+")'class = 'btn btn-success'> + </div>
+								<div> {{element.returned}} </div>
+								<div (click) = 'changeEditReturnCartQuantity(r,"-")'class = 'btn btn-danger'>-</div>
+							  </div>
+							
+							</td>
+						  </ng-container>
+
+						  <tr mat-header-row *matHeaderRowDef="closeCartDisplayedColumns"></tr>
+						  <tr mat-row *matRowDef="let row; columns: closeCartDisplayedColumns;" >
+
+						  </tr>
+						</table>
+						
+						<div class = "d-flex flex-row justify-content-between">
+						<div class = "btn btn-success" (click) = "closeTransaction('APPROVED')"> Close </div>
+						</div>
+						<div> RETURN TYPE : {{currentEditCloseReturnType}} </div>
+					</div>
+					
+					</div>
+				</div><!-- APPROVED END -->
+				
+				<!-- DENIED BEGIN -->
+				<div *ngSwitchCase="'DENIED'" class = "container d-flex flex-column justify-content-start p-2 align-items-center w-100">
+					<div class = "container-fluid d-flex flex-row p-2 justify-content-center align-content-center">
+						<!-- Components list -->
+						<table mat-table [dataSource]="currentTransactionsDisplayed" class="mat-elevation-z2">
+						  <!--- Note that these columns can be defined in any order.
+								The actual rendered columns are set as a property on the row definition" -->
+
+						  <!-- Position Column -->
+						  <ng-container matColumnDef="openedDate">
+							<th mat-header-cell *matHeaderCellDef> Opened Date </th>
+							<td mat-cell *matCellDef="let element"> {{element.openedDate}} </td>
+						  </ng-container>
+
+						  <!-- Name Column -->
+						  <ng-container matColumnDef="customerName">
+							<th mat-header-cell *matHeaderCellDef> Customer</th>
+							<td mat-cell *matCellDef="let element"> {{element.customerName}} </td>
+						  </ng-container>
+
+						  <tr mat-header-row *matHeaderRowDef="displayedColumnsTransactions"></tr>
+						  <tr mat-row *matRowDef="let row; columns: displayedColumnsTransactions;" (click) = "changeEditFocus(row)" ></tr>
+						</table>
+					<!-- edit transaction : cart -->
+					<div class = 'col container d-flex flex-column justify-content-start'>
+					<h4> Cart </h4>
+
+						<!-- Components list -->
+						<table mat-table [dataSource]="currentEditCartToDisplay" class="mat-elevation-z2">
+						  <!--- Note that these columns can be defined in any order.
+								The actual rendered columns are set as a property on the row definition" -->
+
+						  <!-- Position Column -->
+						  <ng-container matColumnDef="name">
+							<th mat-header-cell *matHeaderCellDef> ID </th>
+							<td mat-cell *matCellDef="let element"> {{element.Name}} </td>
+						  </ng-container>
+
+						  <!-- Name Column -->
+						  <ng-container matColumnDef="quantity">
+							<th mat-header-cell *matHeaderCellDef> Quantity</th>
+							<td style = "width:200px" mat-cell *matCellDef="let element;index as r" ><div class = 'w-100 d-flex flex-row justify-content-center align-items-center p-1'><div (click) = 'changeEditCartQuantity(r,"+")'class = 'btn btn-success'> + </div> <div class = 'px-2'>{{element.quantity}}</div> <div (click) = 'changeEditCartQuantity(r,"-")'class = 'btn btn-danger'>-</div><div (click)="removeEditCartItem(r)" class = "btn btn-dark"> X </div></div></td>
+						  </ng-container>
+
+						  <tr mat-header-row *matHeaderRowDef="displayedColumnsCart"></tr>
+						  <tr mat-row *matRowDef="let row; columns: displayedColumnsCart;" (click) = "changeFocus(row)"></tr>
+						</table>
+						
+
+						</div>
+					</div>
+
+					</div>
+				</div>
+				
+				
+				<!-- DENIED END -->
+			</div>
+		</div>
+		<div>
+	</div>
+	
+</div>
