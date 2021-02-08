@@ -36,6 +36,7 @@ import { ComponentCreationComponent } from './components/restricted/component-cr
 import { ComponentEditorComponent } from './components/restricted/comonent-editor/comonent-editor.component';
 import { LinksPageComponent } from './components/restricted/links-page/links-page.component';
 import { TransactionsComponent } from './components/restricted/transactions/transactions.component';
+import { AccountsManagerComponent } from './components/restricted/accounts-manager/accounts-manager.component';
 
 @NgModule({
   declarations: [
@@ -51,7 +52,8 @@ import { TransactionsComponent } from './components/restricted/transactions/tran
     ComponentCreationComponent,
     ComponentEditorComponent,
     LinksPageComponent,
-    TransactionsComponent
+    TransactionsComponent,
+    AccountsManagerComponent
   ],
   imports: [
     BrowserModule,

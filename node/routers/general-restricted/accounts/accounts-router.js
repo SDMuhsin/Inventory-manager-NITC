@@ -18,6 +18,7 @@ const putTransactionsUrl = dbBaseUrl + '/transactions_global';
 const findAllTransactionsUrl = dbBaseUrl + '/transactions_global/_find';
 /*
 	T O  D O : Add verification selection to getActiveUsers
+	T O  D O : Role restrict approve accoutns
 
 */
 router.get('/users/all/active',function(req,res){
@@ -44,4 +45,106 @@ router.get('/users/all/active',function(req,res){
 	}});
 });
 
+router.get('/users/approved/:role',function(req,res){
+	
+	const logEnv = "[ACCOUNTS ROUTER][GET ROLE WISE APPROVED USERS]";
+	
+	const queryBody = {
+	"selector":{
+		"active_indicator":{"$eq":1},
+		"user_access_level":{"$eq":req.params.role},
+		"user_account_approved":{"$eq":1}
+	}};
+
+	var options = {
+	url : dbUserFindQuery,
+	json:true,
+	body:queryBody
+	};
+
+	//Return all users with the same regNo
+	request.post(options, (err,res2,body) => {
+	if(err){console.log(err);res.end(500).end(err);}
+	else{
+		console.log(logEnv + "Found users", body["docs"].length);
+		res.status(200).json(body["docs"]);
+	}});
+});
+router.get('/users/pending/:role',function(req,res){
+	
+	const logEnv = "[ACCOUNTS ROUTER][GET ROLE WISE PENDING USERS]";
+	
+	const queryBody = {
+	"selector":{
+		"active_indicator":{"$eq":1},
+		"user_access_level":{"$eq":req.params.role},
+		"user_account_approved":{"$eq":0}
+	}};
+
+	var options = {
+	url : dbUserFindQuery,
+	json:true,
+	body:queryBody
+	};
+
+	//Return all users with the same regNo
+	request.post(options, (err,res2,body) => {
+	if(err){console.log(err);res.end(500).end(err);}
+	else{
+		console.log(logEnv + "Found users", body["docs"].length);
+		res.status(200).json(body["docs"]);
+	}});
+});
+
+router.post('/users/approve',function(req,res){
+	
+	const logEnv = "[ACCOUNTS ROUTER][Approve users]";
+	
+	/*
+		Expected body:
+		
+		{
+			"ids":[....]
+		}
+	*/
+	
+	// Not much to do, just bulk update
+	var queryBody = {
+		"docs":[ req.body.ids.map((e)=>{return {"_id":e,"user_account_approved":1};})]
+	};
+	
+	//Return all users with the same regNo
+	request.post(options, (err,res2,body) => {
+	if(err){console.log(err);res.json(err);}
+	else{
+		console.log(logEnv + "approved users", body["docs"].length);
+		res.status(200).json(body["docs"]);
+	}});
+});
+
+router.post('/users/deactivate',function(req,res){
+	
+	const logEnv = "[ACCOUNTS ROUTER][Deactivate users]";
+	
+	/*
+		Expected body:
+		
+		{
+			"ids":[....]
+		}
+	*/
+	
+	// Not much to do, just bulk update
+	var queryBody = {
+		"docs":[ req.body.ids.map((e)=>{return {"_id":e,"active_indicator":0};})]
+	};
+	
+	//Return all users with the same regNo
+	request.post(options, (err,res2,body) => {
+	if(err){console.log(err);res.json(err);}
+	else{
+		console.log(logEnv + "approved users", body["docs"].length);
+		res.status(200).json(body["docs"]);
+	}});
+});
 module.exports = router;

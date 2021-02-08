@@ -30,6 +30,9 @@ export class DataService {
   approveTransactionUrl:string = 'http://localhost:9876/guarded/transactions/approve';
   closeTransactionUrl:string = 'http://localhost:9876/guarded/transactions/close';
   getTransactionsUrl:string =  'http://localhost:9876/guarded/transactions/view/'; // URL BASE
+  
+  getAccountsByStatRoleUrl: string = 'http://localhost:9876/guarded/accounts/users/'; // URL BASE
+  
   constructor(private http:HttpClient) {
 	  
   }
@@ -80,4 +83,7 @@ export class DataService {
 	  return this.http.post(this.closeTransactionUrl,o,{withCredentials:true});
   }
   
+  getAccounts(stat,role){
+	  return this.http.get(this.getAccountsByStatRoleUrl + stat + '/' + role, {withCredentials:true});
+  }
 }

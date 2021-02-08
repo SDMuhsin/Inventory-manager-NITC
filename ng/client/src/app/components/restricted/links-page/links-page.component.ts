@@ -35,7 +35,8 @@ export class LinksPageComponent implements OnInit {
 		{url:'/restricted/component/creation',name:'Create Component'},
 		{url:'/restricted/component/editor',name:'Edit Component'},
 		{url:'/restricted/template/generator',name:'Create Template'},
-			{url:'/restricted/transactions',name:'Transactions'}
+			{url:'/restricted/transactions',name:'Transactions'},
+			{url:'/restricted/accounts',name:'Accounts manager'}
 		];		
 	}
   }

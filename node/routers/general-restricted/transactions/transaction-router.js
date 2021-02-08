@@ -501,7 +501,7 @@ router.post('/approve',function(req,res){
 /*
 	This can be  : Full return and partial return
 	Based on time stamps, we can compute whether is was due or not
-	To the receipt : 1. APPROVAL_STATUS : APPROVED -> CLOSED
+	[TO DO (I think)]To the receipt : 1. APPROVAL_STATUS : APPROVED -> CLOSED
 					 2. DUE_STATUS  : DUE -> CLOSED
 					 3. RETURN_STATUS : FULL_RETURN / PARTIAL_RETURN / FAILED_TO_RETURN
 					 

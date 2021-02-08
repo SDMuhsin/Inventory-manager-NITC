@@ -77,6 +77,7 @@ function validateRole(requiredAccess){
 		}		
 	}else if(requiredAccess == validRoles[2]){// User has requested staff content
 		if([validRoles[2]].includes(userRole)){
+			console.log("PROCEED AS ADMIN");
 			next(); // Proceed
 		}else{
 			res.status(401).end();
