@@ -47,7 +47,7 @@ router.post('/register', (req,res)=>{
 			request.post(options, (err,res2,body) => {
 				if(err){console.log(err);res.end(500).end(err);}
 				else{
-					console.log(body);
+					//console.log(body);
 					//res.json(body);
 					
 					//If duplicates found
@@ -79,7 +79,7 @@ router.post('/register', (req,res)=>{
 						request.post(options,(err,res3,body3)=>{
 							if(err){console.log(err);res.status(500).end()}
 							else{
-								console.log(body3);
+								//console.log(body3);
 								res.status(200).json({
 									"status":1,
 									"error":{}
@@ -124,7 +124,7 @@ router.post('/login', (req,res) =>  {
 		if(err){console.log(err);res.status(500).end();}
 		else{
 			//Check if such a user exists
-			if(!body["docs"].length){
+			if( !body["docs"].length){
 				
 				//No user found, check if password match issue
 				queryBody["selector"] = {"user_registration_number":{"$eq":regNo}};

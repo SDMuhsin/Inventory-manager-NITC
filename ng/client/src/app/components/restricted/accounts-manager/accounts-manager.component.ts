@@ -11,7 +11,7 @@ export class AccountsManagerComponent implements OnInit {
   currentDisplayAccounts;
   currentStat:string = 'pending';
   currentRole:string = 'Admin';
-  validRoles:string = ["Admin","Student","Staff"];
+  validRoles:string[] = ["Admin","Student","Staff"];
   constructor(private dataService:DataService) {
   this.dataService.getAccounts(this.currentStat,this.currentRole).subscribe( 
   data=>{
@@ -31,5 +31,19 @@ export class AccountsManagerComponent implements OnInit {
   }
   ngOnInit(): void {
   }
-
+  
+  approve(id){
+	  console.log("Approve ",id);
+	  let ids = [id];
+	  let o = {"ids":ids};
+	  console.log(o);
+	  this.dataService.approveAccounts(o).subscribe( d => {console.log(d);this.refreshData();}, e => {console.log(e)});
+  }
+  deactivate(id){
+	  console.log("Approve ",id);
+	  let ids = [id];
+	  let o = {"ids":ids};
+	  console.log(o);
+	  this.dataService.deactivateAccounts(o).subscribe( d => {console.log(d);this.refreshData();}, e => {console.log(e)});
+  }
 }

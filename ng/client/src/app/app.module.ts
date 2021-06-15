@@ -37,6 +37,8 @@ import { ComponentEditorComponent } from './components/restricted/comonent-edito
 import { LinksPageComponent } from './components/restricted/links-page/links-page.component';
 import { TransactionsComponent } from './components/restricted/transactions/transactions.component';
 import { AccountsManagerComponent } from './components/restricted/accounts-manager/accounts-manager.component';
+import { DBManagerComponent } from './components/restricted/dbmanager/dbmanager.component';
+import { CDLabComponent } from './components/restricted/cd-lab/cdlab/cdlab.component';
 
 @NgModule({
   declarations: [
@@ -53,7 +55,9 @@ import { AccountsManagerComponent } from './components/restricted/accounts-manag
     ComponentEditorComponent,
     LinksPageComponent,
     TransactionsComponent,
-    AccountsManagerComponent
+    AccountsManagerComponent,
+    DBManagerComponent,
+    CDLabComponent
   ],
   imports: [
     BrowserModule,

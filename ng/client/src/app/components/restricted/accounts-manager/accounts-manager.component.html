@@ -24,8 +24,8 @@
 			<div class = "d-flex flex-row p-2 shadow-sm "*ngFor = "let i of currentDisplayAccounts">
 				<div class = "p-1">{{ i.user_registration_number }} </div>
 				<div class = "p-1">{{ i.user_access_level }} </div>
-				<div *ngIf = "currentStat == 'pending'" class = "btn btn-success p-1"> APPROVE</div>
-				<div  class = "btn btn-danger p-1"> DELETE</div>
+				<div *ngIf = "currentStat == 'pending'" class = "btn btn-success p-1" (click) = "approve(i._id)"> APPROVE</div>
+				<div  class = "btn btn-danger p-1" (click) = "deactivate(i._id)"> DELETE</div>
 			</div>
 		</div>
 	</div>

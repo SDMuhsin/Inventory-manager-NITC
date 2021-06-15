@@ -3,6 +3,7 @@ const router = require('express').Router();
 
 
 var request = require('request');
+const { route } = require('../profile/profileRouter');
 
 
 const dbBaseUrl = 'http://admin:qwerty@127.0.0.1:5984/';
@@ -10,6 +11,7 @@ const findAllUrl = dbBaseUrl + '/labs_global/_find';
 const findLabInventoryUrl = dbBaseUrl + '/components_global/_find';
 const findComponentTemplateUrl = dbBaseUrl + '/component_templates_global/_find';
 const postComponentTemplateUrl = dbBaseUrl + '/component_templates_global/';
+const postLabUrl = dbBaseUrl + '/labs_global/';
 const getComponentTemplatesUrl = dbBaseUrl + '/component_templates_global/_find';
 const postComponentUrl = dbBaseUrl + '/components_global/';
 const putComponentUrl = dbBaseUrl + '/components_global/'; // Add id
@@ -49,6 +51,50 @@ router.get('/inventory/:labid', function(req,res){
 	});
 });
 
+router.post('/create', function(req,res){
+	console.log("CREATE LAB", req.body);
+	// Expect body
+	/*
+		{
+			"lab_name": "EC 01",
+			"lab_description": "Lorem Ipsum",
+			"active_indicator": 1,
+			"create_timestamp": ""
+		}
+	*/
+	var options =  {
+		url : postLabUrl,
+		json : true,
+		body: req.body
+	};
+
+	request.post( options, (e,r,b) =>{
+
+		if(e){console.log("ERROR ", e); res.json(e)}
+		else{
+			console.log("Lab created");
+			res.status(200).json(body);
+		}
+	});
+
+});
+
+router.post('/delete', function(req,res){
+
+
+	var options = {
+		url : postLabUrl + req.body._id + '?rev=' + req.body._rev,
+		json:true
+	};	
+	request.delete(options, (err,res2,body)=>{
+		if(err){console.log(err);res.end(500).end(err);}
+		else{
+			console.log("DELETE Success...probably",body);
+			res.status(200).json(body);
+		}
+		}
+	);	
+});
 router.post('/inventory/components/by_ids', function(req,res){
 	console.log('LAB components for component ids', req.body.component_ids);
 	
@@ -68,7 +114,12 @@ router.post('/inventory/components/by_ids', function(req,res){
 		if(err){console.log(err);res.end(500).end(err);}
 		else{
 			console.log("[GET COMPONENTS BY ID]" , body["docs"]);
-			res.json(body["docs"]);
+
+			if(body && body["docs"]){
+				res.json(body["docs"]);
+			}else{
+				res.status(500).end("Just refresh");
+			}
 		}
 	});
 });

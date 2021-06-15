@@ -1,0 +1,39 @@
+<div class = "container-fluid w-100 h-100">
+    <div class = "p-2 d-flex flex-column  justify-content-start shadow-sm m-1">
+        <div class = "m-1 p-2 shadow-sm">
+            <p class = "text-center w-100"> Create New lab</p>
+
+            <div class = "d-flex flex-column justify-content-center">
+                <label>
+                    Lab name : 
+                    <input [(ngModel)] = "newLabName" type = "text" />
+                </label>
+                <br>
+                <label>
+                    Lab description :
+                    <textarea [(ngModel)] = "newLabDesc">
+
+                    </textarea>
+                </label>
+                
+                <button (click) = "createNewLab()" >
+                    CREATE
+                </button>
+                <p>
+                    {{msg}}
+                </p>
+            </div>
+        </div>
+        <div class = "d-flex flex-column flex-start w-100" *ngFor = "let lab of labs" > 
+            <div class = "p-2 shadow-sm d-flex flex-row justify-content-between ">
+                {{lab.lab_name}}
+                ,
+                {{lab.lab_description}}
+                <button (click) = "deleteLab(lab._id,lab._rev)">
+                    DELETE
+                </button>
+            </div>
+        <div>
+
+    </div>
+</div>

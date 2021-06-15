@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import {DataService} from '../../../services/data/data.service';
 import {MatTableDataSource} from '@angular/material/table';
+import { utf8Encode } from '@angular/compiler/src/util';
 
 @Component({
   selector: 'app-transactions',
@@ -30,6 +31,7 @@ export class TransactionsComponent implements OnInit {
   
   activeUsers;
   currentLendee:string;
+  currentLendeeUserName:string = "NONE";
   currentLender:string;
   
   transactionCreationStatusMessage:string = "";
@@ -51,6 +53,13 @@ export class TransactionsComponent implements OnInit {
 	  //Get current lender
   }
   
+  findUserNameFromId(id:string){
+	  for(let i = 0; i < this.activeUsers.length; i++){
+		  if(id == this.activeUsers._id){
+			  console.log("ACTIVE USERS", this.activeUsers);
+		  }
+	  }
+  }
   changeCurrentLab(){
 	  if(this.currentLabId != "None"){
 		  console.log("[changeCurrentLab()] this.currentLab",this.currentLabId);
@@ -119,27 +128,39 @@ export class TransactionsComponent implements OnInit {
   }
   
   changeLendee(row){
+	  console.log("Changing Lendee", row);
 	  this.currentLendee = row._id;
+	  this.currentLendeeUserName = row.user_registration_number;
   }
   
   createTransaction(){
-	const cartToGo = this.cartToDisplay.map( function(e) {return {"component_id":e._id,"quantity":e.quantity};});
-	const transaction = {
-		"type":"LEND",
-		"customer":this.currentLendee,
-		"cart":cartToGo
-	};
-	this.dataService.postTransaction(transaction).subscribe(data=>{
-		console.log("Transaction sent, response", data);
-		if(data.status){
-			this.transactionCreationStatusMessage = "Transaction Success";
-		}
-	}); 
+	this.transactionCreationStatusMessage = "Creating transaction ....";
+	if(!this.currentLendee || this.currentLendee == 'NONE'){
+		this.transactionCreationStatusMessage = "CHOOSE LENDEE";
+	}else{
+		
+		const cartToGo = this.cartToDisplay.map( function(e) {return {"component_id":e._id,"quantity":e.quantity};});
+		const transaction = {
+			"type":"LEND",
+			"customer":this.currentLendee,
+			"cart":cartToGo
+		};
+		this.dataService.postTransaction(transaction).subscribe(data=>{
+			console.log("Transaction sent, response", data);
+			if(data.status){
+				this.transactionCreationStatusMessage = "Transaction Success";
+				this.changeEditMode();
+			}
+		}); 
+	}
   }
   
-  
+  //Utility
+  dateToString(a:string){
+	  var d = new Date(a).toLocaleDateString();
+	  return d;
+  }
   /*
-	
 		Exclusively edit transaction functions and variables
 		TODO
 		1. Make switchcase tabs : DONE 03/01/2021
@@ -149,7 +170,7 @@ export class TransactionsComponent implements OnInit {
 		5. Modify edit transaction cart : DONE 11/01/2021
 		6. Create transaction + approve transaction : DONE 13/01/2021
 		7. Deny transaction : DONE 14/01/2021
-		8. Close transaction : DO 19/01/2021
+		8. Close transaction : DONE 19/01/2021
 		
 		
   */
@@ -173,39 +194,55 @@ export class TransactionsComponent implements OnInit {
   closeCartDisplayedColumns = ['name','quantity','returned'];
   editCloseReturnTypes:string[] = ["FULL","PARTIAL","FAILED"];
   currentEditCloseReturnType:string = "FULL";
+
   changeEditMode(){
+		//this.refreshCarts();
+	  	// Print the current edit mode
 		console.log(this.currentEditMode);
+
+		// Get users
 		this.dataService.getActiveUsers().subscribe(data=>{
 		  console.log("user data :",data);
 		  this.activeUsers = data;
-		  		this.dataService.getTransactions( this.currentEditMode.toLowerCase() + "_transactions").subscribe( data =>{
-		
-		//console.log(data["rows"][0].value);
-		this.currentTransactions = data["rows"];
-		console.log(this.currentTransactions.length,this.activeUsers.length);
-		this.currentTransactions = this.currentTransactions.map(function(e){ console.log(e.value); e.value.openedDate = e.value.dates.opened;return e.value;} )
-		for(let j = 0; j < this.currentTransactions.length; j += 1){
-			for(let i = 0; i < this.activeUsers.length; i += 1){
-				console.log(this.activeUsers[i]._id , this.currentTransactions[j].customer);
-				if(this.activeUsers[i]._id == this.currentTransactions[j].customer){
-					this.currentTransactions[j].customerName = this.activeUsers[i].user_registration_number;
+		  this.dataService.getTransactions( this.currentEditMode.toLowerCase() + "_transactions").subscribe( 
+			data =>{
+			this.currentTransactions = data["rows"];
+			console.log(this.currentTransactions.length,this.activeUsers.length);
+			this.currentTransactions = this.currentTransactions.map(function(e){ console.log(e.value); e.value.openedDate = e.value.dates.opened;return e.value;} )
+			for(let j = 0; j < this.currentTransactions.length; j += 1){
+				for(let i = 0; i < this.activeUsers.length; i += 1){
+					console.log(this.activeUsers[i]._id , this.currentTransactions[j].customer);
+					if(this.activeUsers[i]._id == this.currentTransactions[j].customer){
+						this.currentTransactions[j].customerName = this.activeUsers[i].user_registration_number;
+					}
 				}
 			}
-		}
-		this.currentTransactionsDisplayed = new MatTableDataSource(this.currentTransactions);
-		console.log(this.currentTransactions);
-		
-	  }, err => {this.editErrorMessage = "Something went wrong, couldn't load";});
-		});
-		
-	 
+			this.currentTransactionsDisplayed = new MatTableDataSource(this.currentTransactions);
+			console.log(this.currentTransactions);
+			
+			//Refresh carts 
+			this.refreshCarts();
 
+			
+	  	}, err => {this.editErrorMessage = "Something went wrong, couldn't load";});
+		});		
   }
   
-  changeEditFocus(rd){
+  refreshCarts(){
+	this.currentEditFocus = {};
+	this.currentEditCart = {};
+	this.currentEditReturnCart = {};
+	this.currentEditCartToDisplay = new MatTableDataSource(this.currentEditCart);
+	this.currentEditReturnCartToDisplay = new MatTableDataSource(this.currentEditReturnCart);
+	this.currentEditCloseReturnType = "";
+	this.currentEditCloseTransactionsFocusReturnCart = [];
+	this.currentEditCloseTransactionsFocusReturnCartMatSource = new MatTableDataSource(this.currentEditCloseTransactionsFocusReturnCart);
+	
+  }
+  changeEditFocus(rd = {"_id":'NONE'}){
 	  //console.log(r);
 	  //this.currentEditFocus = rd;  Must take from this.currentTransactions
-	  var r;
+	  var r:any = {};
 	  for(let i = 0; i < this.currentTransactions.length; i+=1){
 		  if(this.currentTransactions[i]._id == rd._id){
 			  r = this.currentTransactions[i];
@@ -231,8 +268,8 @@ export class TransactionsComponent implements OnInit {
 		  for(let j = 0; j < items.length; j+=1){
 			  if(items[j]._id == this.currentEditCart[i].component_id){
 				  this.currentEditCart[i].in_inventory_count = items[j].in_inventory_count;
-				  this.currentEditCart[i].Name = items[j].Name;
-				  this.currentEditReturnCart[i].Name = items[j].Name;
+				  this.currentEditCart[i].name = items[j].name;
+				  this.currentEditReturnCart[i].name = items[j].name;
 			  }
 		  } 
 	  }
@@ -317,16 +354,49 @@ export class TransactionsComponent implements OnInit {
 	  this.currentEditReturnCartToDisplay = new MatTableDataSource(this.currentEditReturnCart);
   }  
   
+  approveTransactionMessage:string = "";
   approveTransaction(approval_status){
+	this.approveTransactionMessage = "IDLE";
 	  console.log(this.currentEditFocus._id,this.currentEditFocus._rev);
-	  this.dataService.approveTransaction( {"_id":this.currentEditFocus._id,"_rev":this.currentEditFocus._rev,"approval_status":approval_status}).subscribe(data=>{console.log(data);});
+	  this.dataService.approveTransaction( {"_id":this.currentEditFocus._id,"_rev":this.currentEditFocus._rev,"approval_status":approval_status}).subscribe(
+		  data=>{
+		  console.log(data);
+		  if(data["status"]){
+			this.approveTransactionMessage = "Transaction success";
+		  }else{
+			this.approveTransactionMessage = "Transaction failed";
+		  }
+
+		  this.changeEditMode();
+	},
+	err =>{
+		console.log(err);
+		this.approveTransactionMessage = "Transaction failed";
+		this.changeEditMode();
+	}
+	);
   }
+
+
   closeTransaction(){
-	  
+	this.approveTransactionMessage = "IDLE";
 	  var o = {"transaction_id":this.currentEditFocus._id, 
 	  "return_cart": this.currentEditCloseTransactionsFocusReturnCart.map( e=> {return {"_id":e._id, "quantity" : e.returned};})
 	  };
-	  this.dataService.closeTransaction(o).subscribe( data=>{console.log(data);},err=>{console.log(err);} );
+	  this.dataService.closeTransaction(o).subscribe( data=>{
+		  console.log(data);
+		  if(data["status"]){
+		  	this.approveTransactionMessage = "Transaction success";
+		  }else{
+			this.approveTransactionMessage = "Transaction failed";
+		  }
+		  this.changeEditMode();
+		  
+	},err=>{
+		console.log(err);
+		this.approveTransactionMessage = "Failed to close transaction";
+		this.changeEditMode();
+	});
   }
   
 }

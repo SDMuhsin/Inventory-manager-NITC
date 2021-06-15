@@ -1,0 +1,17 @@
+<div class = "container-fluid w-100 h-100 d-flex ">
+    <div class = "container m-2 p-2 shadow-sm">
+        <div *ngFor = "let db of dbs">
+            <div class = "d-flex flex-row justify-content-between" >
+                <div class = "p-1 shadow-sm">
+                    {{db}}
+                </div>
+                <div class = "p-1">
+                    Status : {{ dbStatus[db] ? "Active" : "Inactive"}}
+                </div>
+                <button (click) = "putDb(db)">
+                    Re install (Will delete existing)
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

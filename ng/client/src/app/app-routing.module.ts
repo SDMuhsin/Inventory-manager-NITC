@@ -12,6 +12,9 @@ import {ComponentEditorComponent} from './components/restricted/comonent-editor/
 import {LinksPageComponent} from './components/restricted/links-page/links-page.component';
 import {TransactionsComponent} from './components/restricted/transactions/transactions.component';
 import { AccountsManagerComponent } from './components/restricted/accounts-manager/accounts-manager.component';
+import { DBManagerComponent } from './components/restricted/dbmanager/dbmanager.component';
+import { CDLabComponent } from './components/restricted/cd-lab/cdlab/cdlab.component';
+
 import {AuthGuardService} from './services/guard/auth-guard.service';
 const routes: Routes = [
 	{path:'', component : HomeComponent},
@@ -30,9 +33,14 @@ const routes: Routes = [
         data: {roles: ['Staff','Admin'],accessRequired:true}},
 	{path:'restricted/accounts',component : AccountsManagerComponent,canActivate: [AuthGuardService],
         data: {roles: ['Admin'],accessRequired:true}},
-	
+        {path:'restricted/dbs',component : DBManagerComponent,canActivate: [AuthGuardService],
+        data: {roles: ['Admin'],accessRequired:true}},
+	{path:'restricted/cdlab',component : CDLabComponent,canActivate: [AuthGuardService],
+        data: {roles: ['Admin'],accessRequired:true}},
+
 	{path:'restricted/links-page',component : LinksPageComponent,canActivate: [AuthGuardService],
         data: {roles: [],accessRequired:true}}
+
 ];
 
 @NgModule({

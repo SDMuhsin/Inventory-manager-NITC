@@ -22,7 +22,10 @@ export class DataService {
   postComponentTemplateUrl:string = 'http://localhost:9876/restricted/Student/labs/template';
   postComponentUrl:string = 'http://localhost:9876/restricted/Student/labs/inventory/component';
   getTemplatesUrl:string = 'http://localhost:9876/restricted/Student/labs/template/all';
-  
+
+  postLabUrl:string = "http://localhost:9876/restricted/Admin/labs/create";
+  deleteLabUrl:string = "http://localhost:9876/restricted/Admin/labs/delete";
+
   putComponentUrl:string = 'http://localhost:9876/restricted/Student/labs/inventory/component';
   deleteComponentUrl:string = 'http://localhost:9876/restricted/Student/labs/inventory/component/delete';
   
@@ -32,7 +35,11 @@ export class DataService {
   getTransactionsUrl:string =  'http://localhost:9876/guarded/transactions/view/'; // URL BASE
   
   getAccountsByStatRoleUrl: string = 'http://localhost:9876/guarded/accounts/users/'; // URL BASE
+  approveAccountsUrl: string = 'http://localhost:9876/guarded/accounts/users/approve'; 
+  deactivateAccountsUrl: string = 'http://localhost:9876/guarded/accounts/users/deactivate'; 
   
+  getDBsUrl:string = "http://localhost:9876/guarded/dbs/check";
+  putDBsUrl:string = "http://localhost:9876/guarded/dbs/make/";
   constructor(private http:HttpClient) {
 	  
   }
@@ -57,6 +64,7 @@ export class DataService {
   }
   
   postComponent(obj:any){
+    console.log("POSTING COMPONENT");
 	  return this.http.post(this.postComponentUrl,obj,{withCredentials:true});
   }
   
@@ -85,5 +93,26 @@ export class DataService {
   
   getAccounts(stat,role){
 	  return this.http.get(this.getAccountsByStatRoleUrl + stat + '/' + role, {withCredentials:true});
+  }
+  approveAccounts(o){
+	  return this.http.post(this.approveAccountsUrl,o,{withCredentials:true});
+  }
+  deactivateAccounts(o){
+	  return this.http.post(this.deactivateAccountsUrl,o,{withCredentials:true});
+  }
+
+  getDBs(){
+    return this.http.get(this.getDBsUrl, {withCredentials:true} );
+  }
+  
+  putDb(dbname){
+    return this.http.put(this.putDBsUrl + dbname, {},{withCredentials:true} );
+  }
+
+  postLab(o){
+    return this.http.post(this.postLabUrl, o, {withCredentials:true});
+  }
+  deleteLab(o){
+    return this.http.post(this.deleteLabUrl, o, {withCredentials:true});
   }
 }

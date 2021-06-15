@@ -13,6 +13,7 @@ const postComponentUrl = dbBaseUrl + '/components_global/';
 const authGuard = require('../../../services/middleware/role-checker');
 
 const putComponentUrl = dbBaseUrl + '/components_global/'; // Add id
+const dbUserBulkUpdate = 'http://admin:qwerty@127.0.0.1:5984/users_global/_bulk_docs'; 
 const dbUserFindQuery = 'http://admin:qwerty@127.0.0.1:5984/users_global/_find'; 
 const putTransactionsUrl = dbBaseUrl + '/transactions_global';
 const findAllTransactionsUrl = dbBaseUrl + '/transactions_global/_find';
@@ -48,6 +49,8 @@ router.get('/users/all/active',function(req,res){
 router.get('/users/approved/:role',function(req,res){
 	
 	const logEnv = "[ACCOUNTS ROUTER][GET ROLE WISE APPROVED USERS]";
+	
+	
 	
 	const queryBody = {
 	"selector":{
@@ -99,7 +102,8 @@ router.get('/users/pending/:role',function(req,res){
 router.post('/users/approve',function(req,res){
 	
 	const logEnv = "[ACCOUNTS ROUTER][Approve users]";
-	
+	console.log(logEnv + "body :");
+	console.log(req.body);
 	/*
 		Expected body:
 		
@@ -107,25 +111,53 @@ router.post('/users/approve',function(req,res){
 			"ids":[....]
 		}
 	*/
-	
-	// Not much to do, just bulk update
+	// Find the accounts, get _rev
+	// Then just bulk update
+
 	var queryBody = {
-		"docs":[ req.body.ids.map((e)=>{return {"_id":e,"user_account_approved":1};})]
+		"selector":  { "_id" : {"$in":req.body.ids}}
 	};
-	
+	console.log(logEnv + "body");
+	console.log(queryBody);
 	//Return all users with the same regNo
-	request.post(options, (err,res2,body) => {
+	request.post({
+		url : dbUserFindQuery,
+		json:true,
+		body:queryBody
+	}, (err,res2,body) => {
 	if(err){console.log(err);res.json(err);}
 	else{
-		console.log(logEnv + "approved users", body["docs"].length);
-		res.status(200).json(body["docs"]);
+		//console.log(logEnv + "Found users", body);
+		
+		if(body["docs"].length){
+			var qb = body["docs"].map( e => { e.user_account_approved = 1;return e;} );
+			var qb = {"docs":qb};
+			
+			console.log(logEnv + "UPdate query body", qb);
+			
+				request.post( {
+					url : dbUserBulkUpdate,
+					json:true,
+					body:qb
+				} ,
+				(err,res2,body) => {
+				if(err){console.log(err);res.json(err);}
+				else{
+					console.log(logEnv + "approved users", body);
+					res.status(200).json(body["docs"]);
+				}});
+			
+		}else{
+			res.status(500).json(body["docs"]);
+		}
 	}});
 });
 
 router.post('/users/deactivate',function(req,res){
 	
 	const logEnv = "[ACCOUNTS ROUTER][Deactivate users]";
-	
+console.log(logEnv + "body :");
+	console.log(req.body);
 	/*
 		Expected body:
 		
@@ -133,18 +165,45 @@ router.post('/users/deactivate',function(req,res){
 			"ids":[....]
 		}
 	*/
-	
-	// Not much to do, just bulk update
+	// Find the accounts, get _rev
+	// Then just bulk update
+
 	var queryBody = {
-		"docs":[ req.body.ids.map((e)=>{return {"_id":e,"active_indicator":0};})]
+		"selector":  { "_id" : {"$in":req.body.ids}}
 	};
-	
+	console.log(logEnv + "body");
+	console.log(queryBody);
 	//Return all users with the same regNo
-	request.post(options, (err,res2,body) => {
+	request.post({
+		url : dbUserFindQuery,
+		json:true,
+		body:queryBody
+	}, (err,res2,body) => {
 	if(err){console.log(err);res.json(err);}
 	else{
-		console.log(logEnv + "approved users", body["docs"].length);
-		res.status(200).json(body["docs"]);
+		//console.log(logEnv + "Found users", body);
+		
+		if(body["docs"].length){
+			var qb = body["docs"].map( e => {e.active_indicator = 0;return e;} );
+			var qb = {"docs":qb};
+			
+			console.log(logEnv + "UPdate query body", qb);
+			
+				request.post( {
+					url : dbUserBulkUpdate,
+					json:true,
+					body:qb
+				} ,
+				(err,res2,body) => {
+				if(err){console.log(err);res.json(err);}
+				else{
+					console.log(logEnv + "approved users", body);
+					res.status(200).json(body["docs"]);
+				}});
+			
+		}else{
+			res.status(500).json(body["docs"]);
+		}
 	}});
 });
 module.exports = router;
