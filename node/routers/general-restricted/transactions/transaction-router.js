@@ -4,8 +4,9 @@ const router = require('express').Router();
 var request = require('request');
 const validRoles = ['Student','Staff','Admin'];
 
-const fs = require('fs-extra')
-const dbAuth = fs.readJsonSync('dbAuthData.json');
+'use strict';
+const fs = require('fs');
+const dbAuth =  JSON.parse(fs.readFileSync('dbAuthData.json') );
 const dbBaseUrl = 'http://'+ dbAuth.username + ':' + dbAuth.password +  '@127.0.0.1:5984/';
 const findLabInventoryUrl = dbBaseUrl + '/components_global/_find';
 const findComponentTemplateUrl = dbBaseUrl + '/component_templates_global/_find';
