@@ -1,0 +1,136 @@
+<div class = "container-fluid w-100 h-100">
+	<div class = "row  w-100 justify-content-center py-4">
+		<div class = "col-sm-8 shadow d-flex flex-column justify-content-start"  >
+            <div class = "p-2">
+                <label>
+                    User name ( Reg no.):
+                    <input [(ngModel)] = "userName" type = "text" />
+                </label>
+                <br>
+                <label>
+                    Password
+                    <input [(ngModel)] = "password" type = "password" />
+                </label>
+                <br>
+                <button (click) = "loadAllData()">
+                    Load data
+                </button>
+                <br>
+                <p>
+                    <label>
+                        Components data status : {{ dMsg}}
+                    </label>
+                </p>
+                <br>
+                <p>
+                    <label>
+                        Labs data status : {{ lMsg}}
+                    </label>
+                </p>
+                <div>
+                    <p>
+                        <label>
+                            Transaction history data status: {{msg}}
+                        </label>
+                    </p>
+                </div>
+            </div>
+
+			<mat-tab-group mat-stretch-tabs >
+			  <mat-tab label="View history"> 
+				<div style = "max-height:90vh;overflow:auto" class="container-fluid py-4 d-flex flex-column justify-content-center" >
+				<button (click) = "getTransactionsHistory()">
+                    Refresh History
+                </button>
+                <select (change) = "selectedHistoryChanged()" [(ngModel)] = "currentlySelectedHistoryIndex">
+                    <option value = "None">NONE</option>
+                    <option *ngFor = "let h of history; index as i" value = {{i}}>
+                        {{ dateToString ( h["dates"]["opened"] )}}
+                    </option>
+                </select>
+
+                <div *ngIf = "hSelected" class = "d-flex flex-column justify-content-start p-2">
+                    <div>
+                        <label>
+                            Status : {{csh["status"]["approval_status"]}}
+                        </label>
+                    </div>
+                    <div>
+                        Cart
+                        <div *ngFor = 'let c of csh["cart"]' >
+                            <label>
+                                
+                                Item Name : {{getCnameById(c["component_id"])}}
+                            </label>,
+                            <label>
+                                Quantity : {{c["quantity"]}}
+                            </label>
+                        </div>
+                    </div>
+                </div>
+				</div>
+			  </mat-tab>
+			  <mat-tab label="Order components"> 
+				<div class="container-fluid py-4 d-flex flex-column justify-content-center" >
+                    <label>
+                        Select lab :
+                        <select (change) = "onSelectedLabChange()" [(ngModel)] = "currentlySelectedLabIndex">
+                            <option value = "None">None</option>
+                            <option *ngFor = "let l of labs;index as i" value = {{i}}>
+                                {{l.lab_name}}
+                            </option>
+                        </select>
+                    </label>
+                    <label>
+                        Select component : 
+                        <select (change) = "onSelectedComponentChange()" [(ngModel)] = "currentlySelectedComponentIndex">
+                            <option value = "None">None</option>
+                            <option *ngFor = "let c of componentsFilteredByLab;index as i" value = {{i}}>
+                                {{c.name}}
+                            </option>
+                        </select>
+                    </label>
+                <div class = "p-2 shadow-sm d-flex flex-row justify-content-center">
+                    <div>
+                        <!-- Details of currently selected componet-->
+                        <label>
+                            Component Name : {{cSC.name}}
+                        </label> <br>
+                        <label>
+                            Available quantity : {{cSC.in_inventory_count}}
+                        </label>
+
+                        <div class = "d-flex flex-column " >
+                            <label *ngFor = "let v of cProp2Disp">
+                                {{ v }} : 
+                                {{ cSC[v]}}
+                                
+                            </label>
+                            <button (click) = "addC2Cart()"> Add to Cart </button>
+                        </div>
+                    </div>
+                    <div class = "p-2 shadow-sm d-flex flex-column">
+                        Cart
+                        <div class = "d-flex flex-column justify-content-start" *ngFor = "let c of cart; index as i">
+                            <label>Component : {{c.name}}</label>
+                            <label>Quantiy : {{c.quantity}}</label>
+                            <div class = "d-flex flex-row">
+                                <button (click) = 'changeCartItemCount( i, "+")'> + </button>
+                                <button (click) = 'changeCartItemCount( i, "-")'> - </button>
+                                <button (click) = 'changeCartItemCount( i, "x")'> Remove </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <button (click) = "submitTransaction()" >Submit order</button><br>
+                        {{tMsg}}
+                    </div>
+                </div>
+				</div>
+			  </mat-tab>
+			</mat-tab-group>
+		</div>
+		
+
+	</div>
+</div>

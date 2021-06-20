@@ -5,8 +5,9 @@ const router = require('express').Router();
 var request = require('request');
 const { route } = require('../profile/profileRouter');
 
-
-const dbBaseUrl = 'http://admin:qwerty@127.0.0.1:5984/';
+const fs = require('fs-extra')
+const dbAuth = fs.readJsonSync('dbAuthData.json');
+const dbBaseUrl = 'http://'+ dbAuth.username + ':' + dbAuth.password +  '@127.0.0.1:5984/';
 const findAllUrl = dbBaseUrl + '/labs_global/_find';
 const findLabInventoryUrl = dbBaseUrl + '/components_global/_find';
 const findComponentTemplateUrl = dbBaseUrl + '/component_templates_global/_find';
@@ -22,12 +23,20 @@ router.get('/', function(req,res){
 		json:true,
 		body:{"selector":{}}
 	};
+	try{
 	request.post(options, (err,res2,body)=>{
 		if(err){console.log(err);res.end(500).end(err);}
 		else{
-			res.json(body["docs"]);
+			if(!body["docs"]){
+				res.status(500).end()
+			}else{
+			res.json(body["docs"]);}
 		}
 	});
+	}
+	catch(e){
+		res.status(500).end();
+	}
 });
 router.get('/inventory/:labid', function(req,res){
 	console.log('LAB Inventory ROUTER for lab', req.params.labid);
@@ -43,12 +52,21 @@ router.get('/inventory/:labid', function(req,res){
 		json:true,
 		body:{"selector":selector}
 	};
+	try{
 	request.post(options, (err,res2,body)=>{
 		if(err){console.log(err);res.end(500).end(err);}
 		else{
+			if(!body["docs"]){
+				res.status(500).end()
+			}else{
 			res.json(body["docs"]);
+			}
 		}
 	});
+	}
+	catch(e){
+		res.status(500).end();
+	}
 });
 
 router.post('/create', function(req,res){
@@ -110,18 +128,26 @@ router.post('/inventory/components/by_ids', function(req,res){
 			}
 		}
 	};
+
+	try{
 	request.post(options, (err,res2,body)=>{
 		if(err){console.log(err);res.end(500).end(err);}
 		else{
 			console.log("[GET COMPONENTS BY ID]" , body["docs"]);
-
-			if(body && body["docs"]){
+			if(!body["docs"]){
+				res.status(500).end()
+			}
+			else if(body && body["docs"]){
 				res.json(body["docs"]);
 			}else{
 				res.status(500).end("Just refresh");
 			}
 		}
 	});
+	}
+	catch(e){
+		res.status(500).end();
+	}
 });
 
 router.post('/inventory/component', function(req,res){
@@ -143,11 +169,15 @@ router.post('/inventory/component', function(req,res){
 	json:true,
 	body:{"selector":selector}
 	};
+
+	try{
 	request.post(options, (err,res2,body)=>{
 		if(err){console.log(err);res.end(500).end(err);}
 		else{
-			
-			if(body["docs"].length == 0){
+			if(!body["docs"]){
+				res.status(500).end()
+			}
+			else if(body["docs"].length == 0){
 				//No dupes
 				var options = {
 					url : postComponentUrl,
@@ -168,6 +198,8 @@ router.post('/inventory/component', function(req,res){
 			}
 		}
 	});
+	}
+	catch(e){res.status(500).end();}
 	console.log(req.body);
 
 	
@@ -193,11 +225,15 @@ router.post('/template', function(req,res){
 		body:{"selector":{"template_name":name}}
 	};
 	
+	try{
 	request.post(options, (err,res2,body)=>{
 		if(err){console.log(err);res.end(500).end(err);}
 		else{
 			console.log("Response to dup check",body);
-			if(body["docs"].length == 0){
+			if(!body["docs"]){
+				res.status(500).end()
+			}
+			else if(body["docs"].length == 0){
 				//No duplicates
 				
 				
@@ -219,7 +255,10 @@ router.post('/template', function(req,res){
 				res.status(400).json({status:0,error:{error_code:0,error_message:"Component Type already exists"}})
 			}
 		}
-	});
+	});}
+	catch(e){
+		res.status(500).end();
+	}
 });
 
 router.get('/template/all', function(req,res){
@@ -239,11 +278,15 @@ router.get('/template/all', function(req,res){
 		body:{"selector":{}}
 	};
 	
+	try{
 	request.post(options, (err,res2,body)=>{
 		if(err){console.log(err);res.end(500).end(err);}
 		else{
 			console.log("Response to dup check",body);
-			if(body["docs"].length == 0){
+			if(!body["docs"]){
+				res.status(500).end()
+			}
+			else if(body["docs"].length == 0){
 				//No templates found ---> Shouldnt happen...
 				res.status(400).json({status:0,error:{error_code:0,error_message:"No templates found"}})
 				
@@ -251,7 +294,11 @@ router.get('/template/all', function(req,res){
 				res.status(200).json(body["docs"]);
 			}
 		}
-	});	
+	});
+	}
+	catch(e){
+		res.status(500).end();
+	}
 });
 
 //UPDATE (PUT)

@@ -4,7 +4,9 @@ const router = require('express').Router();
 var request = require('request');
 const validRoles = ['Student','Staff','Admin'];
 
-const dbBaseUrl = 'http://admin:qwerty@127.0.0.1:5984/';
+const fs = require('fs-extra')
+const dbAuth = fs.readJsonSync('dbAuthData.json');
+const dbBaseUrl = 'http://'+ dbAuth.username + ':' + dbAuth.password +  '@127.0.0.1:5984/';
 const findLabInventoryUrl = dbBaseUrl + '/components_global/_find';
 const findComponentTemplateUrl = dbBaseUrl + '/component_templates_global/_find';
 const postComponentTemplateUrl = dbBaseUrl + '/component_templates_global/';
@@ -13,7 +15,7 @@ const postComponentUrl = dbBaseUrl + '/components_global/';
 const authGuard = require('../../../services/middleware/role-checker');
 
 const putComponentUrl = dbBaseUrl + '/components_global/'; // Add id
-const dbUserFindQuery = 'http://admin:qwerty@127.0.0.1:5984/users_global/_find'; 
+const dbUserFindQuery = dbBaseUrl + 'users_global/_find'; 
 const putTransactionsUrl = dbBaseUrl + '/transactions_global';
 const findAllTransactionsUrl = dbBaseUrl + '/transactions_global/_find';
 
@@ -67,12 +69,7 @@ router.post('/create2', function(req,res){
 	*/
 	const logEnv = "[TRANSACTIONS ROUTER][CREATE]";
 	const trans = req.body;
-	
 	console.log(logEnv,trans);
-	
-	//Approval required? (1/0)
-	//const approvalRequired = req.params.approve;
-	
 	// Check if required columns exist
 	if(trans.customer == undefined  || trans.cart == undefined){
 		console.log(logEnv + " incomplete request");
@@ -83,8 +80,11 @@ router.post('/create2', function(req,res){
 		//Query DB, find user
 	var queryBody = {
 		"selector":{
-			"_id":{"$eq":trans.customer}
-	}};
+		"_id":{"$eq":trans.customer},
+		"active_indicator":{"$eq":1},
+		"user_account_approved":{"$eq":1}
+		}
+	};
 	var options = {
 		url : dbUserFindQuery,
 		json:true,
@@ -92,10 +92,14 @@ router.post('/create2', function(req,res){
 	};
 	
 	//Return all users with the same regNo
+	try{
 	request.post(options, (err,res2,body) => {
 			if(err){console.log(err);res.status(500).end();}
 			else{
-				if(!body["docs"].length){
+				if(!body["docs"]){
+					res.status(500).end()
+				}
+				else if(!body["docs"].length){
 					//Customer _id does not exist
 					console.log(logEnv + " Customer does not exist");
 					res.status(400).json({status:0,msg:"Customer does not exist"});
@@ -170,94 +174,42 @@ router.post('/create2', function(req,res){
 										res.status(400).json({status:0,msg:"NO STOCK",payload:{"ids":ids,"sufficient":sufficientQuant}});
 								}
 								else{
-									// Subtract item counts from database
-									/* [DB LATCH START]
-									for(let i = 0; i < returns.length; i = i + 1){
-										returns[i].in_inventory_count = sufficientQuant[i];
-									}
+									trans.lender = req.user.username;
+									trans.dates = {"opened":Date.now(),"closed":""},
+									trans.status = {
+										"approval_status": "PENDING",
+										"due_status": "DUE",
+										"return_status": "NOT_RETURNED",
+										"date": Date.now(),
+										"lender":trans.lender
+									};
+									//add to transaction db
+									trans.status_history = [trans.status];											
 									var queryBody = {
-										"docs":returns
+										"docs":[trans]
 									};
 									var options = {
-										url : putComponentUrl + '/_bulk_docs',
+										url : putTransactionsUrl + '/_bulk_docs',
 										json:true,
 										body:queryBody
 									};	
-									request.post(options, (err,res4,body4) => {
-										if(err){console.log(err);res.status(500).end();}
-										else{
-											// Succesfully updated DB !
-											console.log(logEnv + "DB update success");
-											console.log(logEnv + "BODY4", body4);
-											
-											[DB LATCH END]*/
-											//Create transaction receipt
-											/*
-											We have + We need to add( indicated by <>:
-											{
-											  "type": "lend",
-											  "customer": "B170011EC",
-											  "lender": "ADMA",
-											  "comments": [
-												"Test comment"
-											  ],
-											  "cart": [
-												{
-												  "component_id": "123",
-												  "quantity": 5,
-												}
-											  ],
-											  ],
-											  <-"dates":{open:Date.now(),closed:""},->
-											  <-"status" : {
-																																															"approval_status": "PENDING",
-												"due_status": "DUE",
-												"return_status": "NOT_RETURNED",
-										"		"date": Date.now() 
-											  } ->,
-											  <-"status_history":[above]->,
-											}
-											*/	
-											trans.lender = req.user.username;
-											trans.dates = {"opened":Date.now(),"closed":""},
-											trans.status = {
-												"approval_status": "PENDING",
-												"due_status": "DUE",
-												"return_status": "NOT_RETURNED",
-												"date": Date.now(),
-												"lender":trans.lender
-											};
-											//add to transaction db
-											trans.status_history = [trans.status];											
-											var queryBody = {
-												"docs":[trans]
-											};
-											var options = {
-												url : putTransactionsUrl + '/_bulk_docs',
-												json:true,
-												body:queryBody
-											};	
-											request.post(options, (err,res5,body5) => {
-											if(err){console.log(err);res.status(500).end();}
-											else{
-												console.log(logEnv+ " Transaction success !");
-												console.log(logEnv + " body5 ",body5);
-												
-												// Success, transaction receipt created, now approve receipt if required
-												//console.log(logEnv + "Checking if approval required",approvalRequired);
-												
-												//Transaction created, END
-												
-												res.status(200).json({status:1,msg:"success",doc_id:body5});
-												// :-)
-											}
-											});
-									/*[DB LATCH START 2]}}
-									);					[DB LATCH END 2]*/				
+									request.post(options, (err,res5,body5) => {
+									if(err){console.log(err);res.status(500).end();}
+									else{
+										console.log(logEnv+ " Transaction success !");
+										console.log(logEnv + " body5 ",body5);
+										
+										// Success, transaction receipt created, now approve receipt if required
+										//console.log(logEnv + "Checking if approval required",approvalRequired);
+										
+										//Transaction created, END
+										
+										res.status(200).json({status:1,msg:"success",doc_id:body5});
+										// :-)
+									}
+									});
+			
 								}
-								
-								
-								// Approve if required
 							}
 						}
 					);
@@ -266,16 +218,10 @@ router.post('/create2', function(req,res){
 				}
 			}
 		}
-	);
-
-
-	
-	// Check if items exist
-	
-	
-	// Create transaction
-	
-	//Approve transaction ( if required ) 
+	);}
+	catch(e){
+		res.status(500).end();
+	}
 	
 });
 

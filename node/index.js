@@ -9,6 +9,7 @@ const authGuard = require('./services/middleware/role-checker');
 const studentContentRouter = require('./routers/role-restricted-content/student/student');
 const profileRouter = require('./routers/general-restricted/profile/profileRouter');
 const labsRouter = require('./routers/general-restricted/labs/labsRouter');
+const publicRouter = require('./routers/public/public');
 const dbsRouter = require('./routers/general-restricted/db/dbs');
 const transactionsRouter = require('./routers/general-restricted/transactions/transaction-router');
 const accountsRouter = require('./routers/general-restricted/accounts/accounts-router');
@@ -17,22 +18,35 @@ const app = express();
 const cors = require('cors');
 
 const validRoles = ['Student','Staff','Admin'];
-//app.use(cors({origin:'http://localhost:4200',optionsSuccessStatus:200}));
 
 app.options('*', function (req,res) {
-   console.log("OPTIONS PATH",req);
-   res.setHeader('Access-Control-Allow-Credentials', true);
-   res.setHeader('Access-Control-Allow-Origin', 'http://localhost:4200');res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS,PUT,PATCH,DELETE');
+  console.log("OPTIONS PATH",req);
+  res.setHeader('Access-Control-Allow-Credentials', true);
 
-    // Request headers you wish to allow
-    res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept'); //X-Requested-With,content-type
-    res.sendStatus(200); 
+ var origin = req.headers.origin;
+ 
+ res.setHeader('Access-Control-Allow-Origin', origin);
+ 
+  //es.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS,PUT,PATCH,DELETE');
+
+   // Request headers you wish to allow
+   res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept'); //X-Requested-With,content-type
+   res.sendStatus(200); 
 });
 
+app.use(cors({credentials:true,origin:true})); //cors({origin:'http://localhost:4200',optionsSuccessStatus:200}));
+app.use(cookieParser());
+
+
+
+/*
 app.use(function (req, res, next) {
 
     // Website you wish to allow to connect
-    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:4200');
+    var origin = req.headers.origin;
+    console.log("REQ HEADERS", req.headers);
+    res.setHeader('Access-Control-Allow-Origin', origin);
 
     // Request methods you wish to allow
     res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS,PUT,PATCH,DELETE');
@@ -48,10 +62,10 @@ app.use(function (req, res, next) {
     next();
 });
 
-
+*/
 app.use(express.urlencoded({extended:true}));
 app.use(express.json());
-app.use(cookieParser());
+
 
 //TEST zone
 app.use('/test', [authGuard.authCheck(),authGuard.validateRole("Student")], function(req,res,next){
@@ -60,6 +74,7 @@ app.use('/test', [authGuard.authCheck(),authGuard.validateRole("Student")], func
 });
 
 
+app.use('/public', publicRouter);
 //REGISTER AND LOGIN
 app.use('/auth', authrouter);
 

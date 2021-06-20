@@ -1,7 +1,7 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import {FormsModule} from '@angular/forms';
-import {HttpClientModule} from '@angular/common/http';
+import {HttpClientModule, HTTP_INTERCEPTORS} from '@angular/common/http';
 import {CookieService} from 'ngx-cookie-service';
 
 import { AppRoutingModule } from './app-routing.module';
@@ -40,6 +40,9 @@ import { AccountsManagerComponent } from './components/restricted/accounts-manag
 import { DBManagerComponent } from './components/restricted/dbmanager/dbmanager.component';
 import { CDLabComponent } from './components/restricted/cd-lab/cdlab/cdlab.component';
 
+import { HttpsInterceptorService} from './services/https-interceptor.service';
+import { StudentTransactionsManagerComponent } from './components/student/student-transactions-manager/student-transactions-manager.component';
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -57,7 +60,8 @@ import { CDLabComponent } from './components/restricted/cd-lab/cdlab/cdlab.compo
     TransactionsComponent,
     AccountsManagerComponent,
     DBManagerComponent,
-    CDLabComponent
+    CDLabComponent,
+    StudentTransactionsManagerComponent
   ],
   imports: [
     BrowserModule,
@@ -79,7 +83,9 @@ import { CDLabComponent } from './components/restricted/cd-lab/cdlab/cdlab.compo
 	MatTableModule,
 	
   ],
-  providers: [AuthenticationService,SessionManagementService,CookieService,AuthGuardService],
+  providers: [AuthenticationService,SessionManagementService,CookieService,AuthGuardService,
+    { provide: HTTP_INTERCEPTORS, useClass: HttpsInterceptorService, multi: true }
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

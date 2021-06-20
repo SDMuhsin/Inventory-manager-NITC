@@ -40,9 +40,12 @@ router.all( '/:role/:any', (req,res,next) => {
 	
 	console.log('[AUTHORIZE MIDDLEWARE][TOKEN CHECK]');
 	//Get token
+	
 	const token = req.cookies.token;
-	console.log('GOT COOKIES',token);
+	console.log('GOT COOKIES',req.headers);
+	console.log(req.cookies);
 	if(!token){
+		console.log("Token undefined...");
 		return res.status(401).end();
 	}
 	var payload;

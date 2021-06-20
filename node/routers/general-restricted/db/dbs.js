@@ -5,7 +5,9 @@ const router = require('express').Router();
 var request = require('request');
 
 
-const dbBaseUrl = 'http://admin:qwerty@127.0.0.1:5984/';
+const fs = require('fs-extra')
+const dbAuth = fs.readJsonSync('dbAuthData.json');
+const dbBaseUrl = 'http://'+ dbAuth.username + ':' + dbAuth.password +  '@127.0.0.1:5984/';
 const findAllUrl = dbBaseUrl + '/labs_global/_find';
 const findLabInventoryUrl = dbBaseUrl + '/components_global/_find';
 const findComponentTemplateUrl = dbBaseUrl + '/component_templates_global/_find';

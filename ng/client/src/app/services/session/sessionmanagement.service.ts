@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { CookieService } from 'ngx-cookie-service';
 import { Observable,BehaviorSubject } from 'rxjs';
+import ipData from "../../../assets/backend-ip.json";
+
 @Injectable({
   providedIn: 'root'
 })
@@ -11,6 +13,7 @@ export class SessionManagementService {
    loggedInStatusObservable$: Observable<boolean>;
    
   constructor(private cookieService:CookieService) {
+	
 	  this.loggedInStatus = this.isLoggedIn();
 	  this.loggedInStatusObservable = new BehaviorSubject<boolean>(this.loggedInStatus);
 	  this.loggedInStatusObservable$ = this.loggedInStatusObservable.asObservable();
@@ -26,6 +29,9 @@ export class SessionManagementService {
   setToken(token:any){
 	  this.cookieService.set('token',token);
 	  this.isLoggedIn();
+  }
+  getToken(){
+	  return this.cookieService.get('token');
   }
   setSessionDetails(access_level:string,verified:string){
 	  this.cookieService.set('access_level',access_level);

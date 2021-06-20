@@ -51,15 +51,32 @@ export class LoginComponent implements OnInit {
 		  //Begin Log in
 		  this.auth.login(this.currentUsername,this.currentPassword).subscribe( (re:HttpResponse<any>) => {
 			  console.log(re);
+			  console.log("re[body]",re["body"]);
+			  console.log("re.body[cookies]",re.body["cookies"]);
+			  
 			  if(re.status){
 				  this.currentSuccessMessage = 'Succesful';
-				  this.sesh.setToken(re["cookies"]["token"]);
-				  this.sesh.setSessionDetails(re["cookies"]["access_level"],re["cookies"]["verified"]);
-				  this.loggedIn = this.sesh.isLoggedIn();
-				  this.callParent();
-				  //Route to profile page
-				  this.router.navigate(['/restricted/profile']);
-			  }else if(re.status == 0){
+				  
+				  console.log("Did server set the cookie? ", this.sesh.isLoggedIn());
+				  console.log("The response :", re);
+				  if(!this.sesh.isLoggedIn()){
+				  	this.sesh.setToken(re["cookies"]["token"]);
+				  	this.sesh.setSessionDetails(re["cookies"]["access_level"],re["cookies"]["verified"]);
+
+				  	this.loggedIn = this.sesh.isLoggedIn();
+				  	this.callParent();
+				  	//Route to profile page
+				  	this.router.navigate(['/restricted/profile']);
+				  }else{
+					//console.log("Setting access_level and verified");
+					console.log("Access level (re.body[cookies][access_level]: ", re.body["cookies"]["access_level"]);
+					this.sesh.setSessionDetails(re.body["cookies"]["access_level"],re.body["cookies"]["verified"]);
+					this.loggedIn = this.sesh.isLoggedIn();
+					this.callParent();
+					//Route to profile page
+					this.router.navigate(['/restricted/profile']);
+				  }
+			  }else if(!re.status){
 				  this.currentErrorMessage = 'Failed to log in, known error';
 			  }
 		  },

@@ -14,10 +14,11 @@ import {TransactionsComponent} from './components/restricted/transactions/transa
 import { AccountsManagerComponent } from './components/restricted/accounts-manager/accounts-manager.component';
 import { DBManagerComponent } from './components/restricted/dbmanager/dbmanager.component';
 import { CDLabComponent } from './components/restricted/cd-lab/cdlab/cdlab.component';
-
+import { StudentTransactionsManagerComponent } from './components/student/student-transactions-manager/student-transactions-manager.component';
 import {AuthGuardService} from './services/guard/auth-guard.service';
 const routes: Routes = [
 	{path:'', component : HomeComponent},
+        {path:'public/transactions', component : StudentTransactionsManagerComponent},
 	{path:'restricted/profile',component : ProfileComponent},
 	{path:'restricted/labs',component : LabsListComponent,canActivate: [AuthGuardService], // accessRequired = verificationRequired
         data: {roles: ['Student','Staff','Admin'],accessRequired:true}},

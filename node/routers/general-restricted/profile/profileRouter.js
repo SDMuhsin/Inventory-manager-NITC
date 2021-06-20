@@ -4,7 +4,12 @@ const cookieParser = require('cookie-parser');
 const jwt = require('jsonwebtoken');
 var request = require('request');
 
-const dbUserFindQuery = 'http://admin:qwerty@127.0.0.1:5984/users_global/_find'; 
+
+const fs = require('fs-extra')
+const dbAuth = fs.readJsonSync('dbAuthData.json');
+const dbBaseUrl = 'http://'+ dbAuth.username + ':' + dbAuth.password +  '@127.0.0.1:5984/';
+
+const dbUserFindQuery =  dbBaseUrl + 'users_global/_find'; 
 
 const roles = [
 	"student",
@@ -27,11 +32,15 @@ router.get('/', function(req,res){
 	console.log(req.user);
 	
 	//Return all users with the same regNo
+	try{
 	request.post(options, (err,res2,body) => {
 		if(err){console.log(err);res.status(500).end();}
 		else{
 			//Check if such a user exists
-			if(!body["docs"].length){
+			if(!body["docs"]){
+				res.status(500).end()
+			}
+			else if(!body["docs"].length){
 				console.log("NO SUCH USER");
 				res.status(401).end();
 			}else{
@@ -51,6 +60,10 @@ router.get('/', function(req,res){
 			}
 		}
 	});
+	}
+	catch(e){
+		res.status(500).end();
+	}
 });
 
 module.exports = router;
